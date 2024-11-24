@@ -141,7 +141,9 @@ void meson_pwm_sysfs_exit(struct device *dev);
 
 /*the functions use for special function in meson pwm driver*/
 int pwm_register_debug(struct meson_pwm *meson);
-struct meson_pwm *to_meson_pwm(struct pwm_chip *chip);
+static inline struct meson_pwm *to_meson_pwm(struct pwm_chip *chip) {
+	return container_of(chip, struct meson_pwm, chip);
+}
 int pwm_constant_enable(struct meson_pwm *meson, int index);
 int pwm_constant_disable(struct meson_pwm *meson, int index);
 int pwm_blink_enable(struct meson_pwm *meson, int index);

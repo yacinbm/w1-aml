@@ -390,3 +390,5 @@ void meson_pwm_sysfs_exit(struct device *dev)
 {
 	sysfs_remove_group(&dev->kobj, &pwm_attr_group);
 }
+
+MODULE_LICENSE("GPL");

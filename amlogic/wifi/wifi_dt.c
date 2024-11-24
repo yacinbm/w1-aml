@@ -424,8 +424,8 @@ static long wifi_power_ioctl(struct file *filp,
 }
 
 static struct class *wifi_dt_class;
-static ssize_t power_show(struct class *cls,
-			  struct class_attribute *attr,
+static ssize_t power_show(const struct class *cls,
+			  const struct class_attribute *attr,
 			  char *_buf)
 {
 	if (!_buf)
@@ -437,8 +437,8 @@ static ssize_t power_show(struct class *cls,
 		"2=power down\n");
 }
 
-static ssize_t power_store(struct class *cls,
-			   struct class_attribute *attr,
+static ssize_t power_store(const struct class *cls,
+			   const struct class_attribute *attr,
 			   const char __user *buf, size_t count)
 {
 	int ret = -EINVAL;
@@ -478,7 +478,6 @@ static const struct file_operations wifi_power_fops = {
 
 static struct class wifi_power_class = {
 	.name = WIFI_POWER_CLASS_NAME,
-	.owner = THIS_MODULE,
 };
 
 static int wifi_setup_dt(void)
@@ -645,8 +644,15 @@ int pwm_double_channel_conf_dt(struct wifi_plat_info *plat)
 	for_each_child_of_node(pnode, child) {
 		struct pwm_double_data *pdata =
 			&plat->ddata.pwms[plat->ddata.num_pwm];
+		
+		const char *pwm_label;
+		ret = of_property_read_string(child, "pwm-label", &pwm_label);
+		if (ret) {
+			dev_err(plat->dev, "missing 'pwm-label' in node\n");
+			return ret;
+		}
 
-		pdata->pwm = devm_of_pwm_get(plat->dev, child, NULL);
+		pdata->pwm = devm_pwm_get(plat->dev, pwm_label);
 		if (IS_ERR(pdata->pwm)) {
 			ret = PTR_ERR(pdata->pwm);
 			dev_err(plat->dev, "unable to request PWM%d, ret = %d\n",
@@ -745,10 +751,10 @@ static int wifi_dev_probe(struct platform_device *pdev)
 			WIFI_INFO("no interrupt pin");
 			plat->interrupt_pin = 0;
 		} else {
-			plat->interrupt_pin = of_get_named_gpio_flags
+			plat->interrupt_pin = of_get_named_gpio
 							(pdev->dev.of_node,
 							"interrupt-gpios",
-							0, NULL);
+							0);
 			ret = of_property_read_string(pdev->dev.of_node,
 						      "irq_trigger_type",
 						      &value);
@@ -781,10 +787,10 @@ static int wifi_dev_probe(struct platform_device *pdev)
 			plat->power_on_pin_OD = 0;
 		} else {
 			wifi_power_gpio = 1;
-			plat->power_on_pin = of_get_named_gpio_flags
+			plat->power_on_pin = of_get_named_gpio
 							(pdev->dev.of_node,
 							"power_on-gpios",
-							0, NULL);
+							0);
 		}
 
 		ret = of_property_read_u32(pdev->dev.of_node,
@@ -804,10 +810,10 @@ static int wifi_dev_probe(struct platform_device *pdev)
 			plat->power_on_pin2 = 0;
 		} else {
 			wifi_power_gpio2 = 1;
-			plat->power_on_pin2 = of_get_named_gpio_flags
+			plat->power_on_pin2 = of_get_named_gpio
 							(pdev->dev.of_node,
 							"power_on_2-gpios",
-							0, NULL);
+							0);
 		}
 
 		ret = of_property_read_string(pdev->dev.of_node,
@@ -816,10 +822,10 @@ static int wifi_dev_probe(struct platform_device *pdev)
 			WIFI_INFO("no chip_en_pin");
 			plat->chip_en_pin = 0;
 		} else {
-			plat->chip_en_pin = of_get_named_gpio_flags
+			plat->chip_en_pin = of_get_named_gpio
 							(pdev->dev.of_node,
 							"chip_en-gpios",
-							0, NULL);
+							0);
 		}
 
 #ifdef CONFIG_AMLOGIC_PWM_32K
@@ -884,7 +890,7 @@ static int wifi_dev_probe(struct platform_device *pdev)
 
 	wifi_setup_dt();
 
-	wifi_dt_class = class_create(THIS_MODULE, "aml_wifi");
+	wifi_dt_class = class_create("aml_wifi");
 	ret = class_create_file(wifi_dt_class, &class_attr_power);
 
 	return 0;
