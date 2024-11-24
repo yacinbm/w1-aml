@@ -2071,7 +2071,7 @@ unsigned char get_cali_param(struct Cali_Param *cali_param, struct WF2G_Txpwr_Pa
         goto err;
     }
 
-    if (vfs_read(fp, content, size, &fp->f_pos) != size) {
+    if (kernel_read(fp, content, size, &fp->f_pos) != size) {
         FREE(content, "wifi_cali_param");
         filp_close(fp, NULL);
         goto err;

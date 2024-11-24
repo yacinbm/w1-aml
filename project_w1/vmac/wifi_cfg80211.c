@@ -5741,7 +5741,7 @@ int vm_cfg80211_vnd_cmd_set_para(struct wiphy *wiphy, struct wireless_dev *wdev,
                         goto err;
                     }
 */
-                    vfs_write(fp, buf, strlen(buf), &fp->f_pos);
+                    kernel_write(fp, buf, strlen(buf), &fp->f_pos);
                 }
                 filp_close(fp, NULL);
             }

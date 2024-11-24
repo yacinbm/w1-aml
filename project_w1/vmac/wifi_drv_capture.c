@@ -398,10 +398,10 @@ int  dut_stop_tbus_to_get_sram(struct file *filep, int stop_ctrl, int save_file)
         for (i = 0; i < len; i += 4) {
             str_2_acsi_32bits((char*)pdata, wt_file);
             for (j = 0 ; j < 8; j++) {
-                vfs_write(filep, &wt_file[j], sizeof(unsigned char), &file_pos);
+                kernel_write(filep, &wt_file[j], sizeof(unsigned char), &file_pos);
             }
             pdata++;
-            vfs_write(filep, (char*)&enter, sizeof(unsigned char), &file_pos);
+            kernel_write(filep, (char*)&enter, sizeof(unsigned char), &file_pos);
         }
     }
 
