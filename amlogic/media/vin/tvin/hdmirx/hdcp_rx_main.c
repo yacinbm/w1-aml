@@ -282,8 +282,8 @@ static int alloc_dma_areas(struct esm_device *esm,
 					  &esm->blob);
 
 	if (randomize_mem) {
-		prandom_bytes(esm->code, esm->code_size);
-		prandom_bytes(esm->data, esm->data_size);
+		get_random_bytes(esm->code, esm->code_size);
+		get_random_bytes(esm->data, esm->data_size);
 	}
 	if (!is_esmmem_created) {
 		if (esm->data_base && esm->code_base) {
